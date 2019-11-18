@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    #root{
+        position: relative;
+    }
+    .item{
+        float: left;
+        padding:  5px;
+    }
+    /* 添加阴影的时候，加上border会显得更加有点悬浮感 */
+    .itemImg{
+        padding: 5px;
+        padding:  5px 5px 0 5px;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 5px #ccc;
+        border-radius: 5px;
+    }
+</style>
+<body>
+
+
+
+<div id="root">
+    <div class="item">
+        <div class="itemImg">
+            <img src="./1.png" alt="">
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemImg">
+            <img src="./2.png" alt="">
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemImg">
+            <img src="./3.png" alt="">
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemImg">
+            <img src="./1.png" alt="">
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemImg">
+            <img src="./2.png" alt="">
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemImg">
+            <img src="./3.png" alt="">
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemImg">
+            <img src="./1.png" alt="">
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemImg">
+            <img src="./2.png" alt="">
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemImg">
+            <img src="./3.png" alt="">
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemImg">
+            <img src="./1.png" alt="">
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemImg">
+            <img src="./2.png" alt="">
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemImg">
+            <img src="./3.png" alt="">
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemImg">
+            <img src="./1.png" alt="">
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemImg">
+            <img src="./2.png" alt="">
+        </div>
+    </div>
+    <div class="item">
+        <div class="itemImg">
+            <img src="./3.png" alt="">
+        </div>
+    </div>
+</div>
+</body>
+
+<script >
+    window.onload = function () {
+
+        /* 计算图片列数及获取最小高度图片 */
+        generateImg('root', 'item');
+
+        /* 对窗口大小改变进行监听，大小改变则重新布局 */
+        window.addEventListener('resize', function() {
+            generateImg('root', 'item')
+        });
+
+        /* 图片对象 */
+        let imgData = {
+            images: [
+                {
+                    "src":"./1.png"
+                },
+                {
+                    "src":"./3.png"
+                },
+                {
+                    "src":"./4.png"
+                },
+                {
+                    "src":"./5.png"
+                },
+                {
+                    "src":"./1.png"
+                }
+            ]
+        };
+        /* 对滚动监听 */
+        window.addEventListener('scroll', function() {
+            if(checkIsScroll()) {
+                let rootElement = document.getElementById('root');
+                /* 利用documentFragment来创建 */
+//                    let documentFragment = document.createDocumentFragment();
+                let length = imgData.images.length;
+
+                /* 循环创建图片组 */
+                for(let i = 0; i < length; i++) {
+                    let itemElement = document.createElement('div');
+                    itemElement.className = 'item';
+                    rootElement.appendChild(itemElement);
+                    let itemImgElement = document.createElement('div');
+                    itemImgElement.className = 'itemImg';
+                    itemElement.appendChild(itemImgElement);
+                    let itemImg = document.createElement('img');
+                    itemImg.style.cssText = 'opacity: 0; transform:scale(0)';
+                    itemImg.src = imgData.images[i].src;
+                    itemImgElement.appendChild(itemImg);
+                    /* 在1秒后让图片显示出来 */
+                    (function(img){
+                        setTimeout(function(){
+                            img.style.cssText="opacity:1;transform:scale(1)";
+                        },1000);
+                    })(itemImg);
+                }
+                generateImg('root', 'item');
+            }
+        });
+    };
+
+    /* 计算图片列数及获取最小高度图片 */
+    function generateImg(parent, content) {
+        /* 获取父元素及其所以节点内容 */
+        let parentElement = document.getElementById(parent);
+        let childContent = getChildElement(parentElement, content);
+        for(let j = 0; j < childContent.length; j++) {
+            childContent[j].children[0].children[0].style.width = document.body.offsetWidth/2-document.body.offsetWidth/100*10+'px';
+            childContent[j].style.width = document.body.offsetWidth/2;
+        }
+        /* 获取图片宽度 */
+        let imgWidth = childContent[0].offsetWidth;
+        /* 获取一行图片形成的列数 */
+        let imgColumn = Math.floor(document.documentElement.clientWidth / imgWidth);
+        /* 重新设置父级容器的宽度 */
+        parentElement.style.cssText = 'width:' + imgColumn * imgWidth + 'px;margin:0 auto';
+
+        /* 存储每个图片的高度，以此来找到最小图片高 */
+        let imgHeightArray = [];
+        let length = childContent.length;
+        for(let i = 0; i < length; i++) {
+            /* i<imgColumn统计每一行的图片高度 */
+            if(i < imgColumn) {
+                /* 防止用户改变窗口大小时，内容样式错乱 */
+                childContent[i].style.cssText = '';
+                imgHeightArray.push(childContent[i].offsetHeight);
+            } else {
+                /* 如果不是这一行的，则找到最小值和最小值的索引值 */
+                let minHeight = getMinImgHeight(imgHeightArray);
+                let minHeightIndex = getMinHeightIndex(imgHeightArray, minHeight);
+                /* 对这个图片设置位置 */
+                childContent[i].style.position = 'absolute';
+                childContent[i].style.top = minHeight + 'px';
+                childContent[i].style.left = childContent[minHeightIndex].offsetLeft + 'px';
+                /* 更换此时的最小高度 */
+                imgHeightArray[minHeightIndex] = childContent[i].offsetHeight + minHeight;
+            }
+        }
+    }
+
+    /* 检测滚动是否达到了可视区 */
+    function checkIsScroll() {
+        /* 获取root根节点 */
+        let parentElement = document.getElementById('root');
+        /* 获取父元素下的类名为box的元素节点 */
+        let childContent = getChildElement(parentElement, 'item');
+
+        /* 获取最后一个元素的高度 */
+        let lastElementHeight = childContent[childContent.length - 1].offsetTop;
+        /* 获取滚动的距离 */
+        let scrollTopSpace = document.documentElement.scrollTop || document.body.scrollTop;
+        /* 获取可视区的距离 */
+        let clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
+
+        if(lastElementHeight > scrollTopSpace + clientHeight) {
+            return true;
+        }
+    }
+    /* 获取子节点的所有内容 */
+    function getChildElement(parentElement, content) {
+        /* 存储元素信息 */
+        let elementArray = [];
+        /* 获取父元素下的所有节点信息 */
+        let allElement = parentElement.getElementsByTagName('*');
+        let length = allElement.length;
+        for (let i = 0; i < length; i++) {
+            /* 找到对应的类名 */
+            if (allElement[i].className === content) {
+                elementArray.push(allElement[i]);
+            }
+        }
+        return elementArray;
+    }
+
+    /* 获取图片最小高度 */
+    function getMinImgHeight(heightArray) {
+        let length = heightArray.length;
+        let minHeight = heightArray[0];
+        for(let i = 0; i < length; i++) {
+            minHeight = Math.min(minHeight, heightArray[i]);
+        }
+        return minHeight;
+    }
+
+    /* 获取图片最小高度的索引值 */
+    function getMinHeightIndex(heightArray, minHeight) {
+        let length = heightArray.length;
+        for(let i = 0; i < length; i++) {
+            if(heightArray[i] == minHeight) {
+                return i;
+            }
+        }
+    }
+</script>
+</body>
+</html>
